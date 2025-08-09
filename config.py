@@ -36,6 +36,8 @@ SCRAPING_MODE_CHESHIRE_CAT = "cheshire_cat"
 SCRAPING_MODES = [SCRAPING_MODE_COLEMAN_LOCAL_AI_PACKAGED, SCRAPING_MODE_CHESHIRE_CAT]
 SCRAPING_MODE = SCRAPING_MODE_CHESHIRE_CAT
 
+MAX_EMBEDDING_ATTEMPTS = 3  # Maximum attempts to embed a document
+
 
 # Configure logging
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='[%Y/%m/%d %I:%M:%S %p]')

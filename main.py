@@ -138,11 +138,11 @@ class WebCrawler:
                              "action=",
                              "diff=",
                              "oldid=",
-                             "jpg",
-                             "jpeg",
-                             "png",
-                             "svg",
-                             "gif",
+#                             "jpg",
+#                             "jpeg",
+#                             "png",
+#                             "svg",
+#                             "gif",
                              "special:",
                              "?",
                              "javascript",
@@ -264,20 +264,27 @@ class WebCrawler:
                                 body_upload_url = BodyUploadUrl(
                                     url=url
                                 )
-                                try:
-                                    response = self.ccat_client.rabbit_hole.upload_url(body_upload_url)
-                                except Exception as e:
-                                    config.logging.error("Error detected: " + e)
-                                    # Handle HTTP errors
-                                    if isinstance(e, HTTPError):
-                                        match e.response.status_code:
-                                            case HTTPStatus.BAD_REQUEST:
-                                                pass       
+                                attempt = 0
+                                successful_upload = False
+                                while (attempt < config.MAX_EMBEDDING_ATTEMPTS and not successful_upload):
+                                    attempt += 1
+                                    config.logging.info(f"Attempt {attempt} to upload URL {url} to Cheshire Cat AI ...")
+                                    try:
+                                        response = self.ccat_client.rabbit_hole.upload_url(body_upload_url)
+                                        successful_upload = True  # Exit loop if successful
+                                    except Exception as e:
+                                        config.logging.error(f"Error uploading URL {url} to Cheshire Cat AI: {str(e)}")
+                                        # Handle HTTP errors
+                                        if isinstance(e, HTTPError):
+                                            match e.response.status_code:
+                                                case HTTPStatus.BAD_REQUEST:
+                                                    pass       
 
-                                    else:
-                                        config.logging.info(f"Skipping vector store operations for {page_docs[0]['url']} ...")
-
-                #documents.extend(page_docs)
+                                if (successful_upload):
+                                    config.logging.info(f"Successfully uploaded {url} to Cheshire Cat AI!")
+                                else:
+                                    # If we reach here, it means we exhausted all attempts without success
+                                    config.logging.error(f"Maximum number of attempts reached ({config.MAX_EMBEDDING_ATTEMPTS}). Skipping {url} ...")                        
                 
                 if depth < self.max_depth:
                     try:

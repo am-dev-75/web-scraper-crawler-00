@@ -21,7 +21,7 @@ Global configuration for the web crawler/scraper application.
 
 import logging
 
-VERSION = "0.3.0"
+VERSION = "0.3.1"
 
 BASE_URL = "wiki.dave.eu"
 CHAT_MODEL = "llama3.2:3b"
